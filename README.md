@@ -17,7 +17,7 @@ https://github.com/auralog-ai/auralog-swift
 Or add it to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/auralog-ai/auralog-swift.git", from: "0.1.0")
+.package(url: "https://github.com/auralog-ai/auralog-swift.git", from: "0.1.0-beta.1")
 ```
 
 The beta targets Swift 5.9+ and Apple platforms supported by Swift Package Manager: iOS 15+, macOS 12+, tvOS 15+, watchOS 8+, and visionOS 1+.
