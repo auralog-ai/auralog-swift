@@ -47,13 +47,13 @@ import Auralog
 import SwiftUI
 
 @main
-struct TrashdayApp: App {
+struct MyApp: App {
     init() {
         try? Auralog.initialize(
             apiKey: "aura_your_key",
             environment: "production",
             globalMetadata: [
-                "app": "trashday",
+                "app": "ios-app",
                 "app_version": .string(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown")
             ],
             captureMetricKit: true,
@@ -128,7 +128,7 @@ Use `globalMetadata` or `globalMetadataProvider` to attach session-scoped fields
 ```swift
 try Auralog.initialize(
     apiKey: "aura_your_key",
-    globalMetadata: ["service": "trashday"],
+    globalMetadata: ["service": "ios-app"],
     globalMetadataProvider: {
         ["user_id": currentUserId.map(AuralogValue.string) ?? .null]
     }

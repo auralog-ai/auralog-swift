@@ -85,7 +85,7 @@ final class AuralogTests: XCTestCase {
             config: AuralogConfig(
                 apiKey: "aura_test",
                 flushInterval: 60,
-                globalMetadata: ["service": "trashday", "user_id": "global"],
+                globalMetadata: ["service": "ios-app", "user_id": "global"],
                 globalMetadataProvider: { ["tenant": "tokyo"] }
             ),
             transport: transport,
@@ -96,7 +96,7 @@ final class AuralogTests: XCTestCase {
         await client.flush()
 
         let metadata = await transport.batches[0][0].metadata
-        XCTAssertEqual(metadata?["service"], "trashday")
+        XCTAssertEqual(metadata?["service"], "ios-app")
         XCTAssertEqual(metadata?["tenant"], "tokyo")
         XCTAssertEqual(metadata?["user_id"], "local")
         await client.shutdown()
