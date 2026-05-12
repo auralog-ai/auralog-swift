@@ -119,4 +119,28 @@ final class AuralogTests: XCTestCase {
         XCTAssertEqual(messages, ["two", "three"])
         await client.shutdown()
     }
+
+    func testWireFormatMatchesIngestContract() throws {
+        let entry = AuralogEntry(
+            level: .error,
+            message: "payment failed",
+            environment: "production",
+            timestamp: "2026-05-12T00:00:00.000Z",
+            metadata: ["order_id": "abc"],
+            stackTrace: "frame 1\nframe 2",
+            traceId: "trace-123"
+        )
+        let payload = AuralogSingleRequest(projectApiKey: "aura_test", log: entry)
+        let data = try JSONEncoder().encode(payload)
+        let object = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let log = object?["log"] as? [String: Any]
+
+        XCTAssertEqual(object?["projectApiKey"] as? String, "aura_test")
+        XCTAssertEqual(log?["level"] as? String, "error")
+        XCTAssertEqual(log?["message"] as? String, "payment failed")
+        XCTAssertEqual(log?["environment"] as? String, "production")
+        XCTAssertEqual(log?["traceId"] as? String, "trace-123")
+        XCTAssertEqual(log?["stackTrace"] as? String, "frame 1\nframe 2")
+        XCTAssertEqual((log?["metadata"] as? [String: Any])?["order_id"] as? String, "abc")
+    }
 }

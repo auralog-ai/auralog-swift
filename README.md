@@ -4,6 +4,8 @@ Swift SDK for [Auralog](https://auralog.ai) — agentic logging and application 
 
 Auralog uses Claude as an on-call engineer: it monitors your logs and errors, alerts you when something's wrong, and opens fix PRs automatically.
 
+[![CI](https://github.com/auralog-ai/auralog-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/auralog-ai/auralog-swift/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/auralog-ai/auralog-swift?include_prereleases&label=release)](https://github.com/auralog-ai/auralog-swift/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 ## Install
@@ -163,6 +165,7 @@ Apps must still disclose the data they choose to attach through logs or metadata
 
 ```bash
 swift test
+swift build --package-path Examples/SwiftUIExample
 ```
 
 The release workflow should tag beta releases as `0.1.0-beta.N`.
