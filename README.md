@@ -118,7 +118,7 @@ SwiftLog only allows one global logging backend. If your app already bootstraps 
 | `traceId` | `String` | _auto-generated_ | Custom trace ID for distributed tracing |
 | `globalMetadata` | `AuralogMetadata` | _none_ | Static metadata merged into every entry |
 | `globalMetadataProvider` | `() -> AuralogMetadata?` | _none_ | Synchronous metadata supplier invoked per entry |
-| `captureMetricKit` | `Bool` | `false` | Forward MetricKit metrics and diagnostics where available |
+| `captureMetricKit` | `Bool` | `false` | Forward MetricKit metrics and diagnostics where available. In this beta, forwarding is implemented for iOS and no-ops on other platforms |
 | `captureUnhandledExceptions` | `Bool` | `false` | Capture uncaught Objective-C exceptions |
 
 ## Global Metadata

@@ -1,6 +1,6 @@
 import Foundation
 
-#if canImport(MetricKit)
+#if canImport(MetricKit) && os(iOS)
 import MetricKit
 
 final class AuralogMetricKitCapture: NSObject, MXMetricManagerSubscriber {
@@ -55,7 +55,7 @@ final class AuralogMetricKitCapture: NSObject, MXMetricManagerSubscriber {
         if let metric = payload as? MXMetricPayload {
             return String(data: metric.jsonRepresentation(), encoding: .utf8) ?? "{}"
         }
-        if #available(iOS 14.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *),
+        if #available(iOS 14.0, *),
            let diagnostic = payload as? MXDiagnosticPayload {
             return String(data: diagnostic.jsonRepresentation(), encoding: .utf8) ?? "{}"
         }

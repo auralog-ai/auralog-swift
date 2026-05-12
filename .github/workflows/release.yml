@@ -31,7 +31,15 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           if [ -f ".github/releases/${TAG}.md" ]; then
-            gh release create "${TAG}" --title "${TAG}" --notes-file ".github/releases/${TAG}.md" --verify-tag
+            if gh release view "${TAG}" >/dev/null 2>&1; then
+              gh release edit "${TAG}" --title "${TAG}" --notes-file ".github/releases/${TAG}.md" --prerelease
+            else
+              gh release create "${TAG}" --title "${TAG}" --notes-file ".github/releases/${TAG}.md" --verify-tag --prerelease
+            fi
           else
-            gh release create "${TAG}" --title "${TAG}" --generate-notes --verify-tag
+            if gh release view "${TAG}" >/dev/null 2>&1; then
+              gh release edit "${TAG}" --title "${TAG}" --prerelease
+            else
+              gh release create "${TAG}" --title "${TAG}" --generate-notes --verify-tag --prerelease
+            fi
           fi
