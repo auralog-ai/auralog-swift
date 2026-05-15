@@ -1,6 +1,6 @@
 # auralogs-swift (Beta)
 
-Swift SDK for [Auralogs](https://auralog.ai) — agentic logging and application awareness.
+Swift SDK for [Auralogs](https://auralogs.ai) — agentic logging and application awareness.
 
 Auralogs uses Claude as an on-call engineer: it monitors your logs and errors, alerts you when something's wrong, and opens fix PRs automatically.
 
@@ -105,7 +105,7 @@ SwiftLog only allows one global logging backend. If your app already bootstraps 
 |---|---|---|---|
 | `apiKey` | `String` | _required_ | Auralogs project API key |
 | `environment` | `String` | `"production"` | e.g. `"production"`, `"staging"`, `"dev"` |
-| `endpoint` | `URL` | `https://ingest.auralog.ai` | Ingest endpoint override. Must be HTTPS unless `allowInsecureEndpoint` is set |
+| `endpoint` | `URL` | `https://ingest.auralogs.ai` | Ingest endpoint override. Must be HTTPS unless `allowInsecureEndpoint` is set |
 | `allowInsecureEndpoint` | `Bool` | `false` | Permit non-HTTPS (`http://`) endpoints. Only enable for local development or trusted internal HTTP-only ingest |
 | `flushInterval` | `TimeInterval` | `5` | Time between batched flushes |
 | `maxBatchSize` | `Int` | `50` | Maximum logs per batch request |
@@ -172,7 +172,7 @@ The release workflow should tag beta releases as `0.1.0-beta.N`.
 
 ## Documentation
 
-Full docs at [docs.auralog.ai](https://docs.auralog.ai).
+Full docs at [docs.auralogs.ai](https://docs.auralogs.ai).
 
 ## Security
 
