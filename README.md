@@ -1,11 +1,11 @@
-# auralog-swift (Beta)
+# auralogs-swift (Beta)
 
-Swift SDK for [Auralog](https://auralog.ai) — agentic logging and application awareness.
+Swift SDK for [Auralogs](https://auralog.ai) — agentic logging and application awareness.
 
-Auralog uses Claude as an on-call engineer: it monitors your logs and errors, alerts you when something's wrong, and opens fix PRs automatically.
+Auralogs uses Claude as an on-call engineer: it monitors your logs and errors, alerts you when something's wrong, and opens fix PRs automatically.
 
-[![CI](https://github.com/auralog-ai/auralog-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/auralog-ai/auralog-swift/actions/workflows/ci.yml)
-[![release](https://img.shields.io/github/v/release/auralog-ai/auralog-swift?include_prereleases&label=release)](https://github.com/auralog-ai/auralog-swift/releases)
+[![CI](https://github.com/auralogs-ai/auralogs-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/auralogs-ai/auralogs-swift/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/auralogs-ai/auralogs-swift?include_prereleases&label=release)](https://github.com/auralogs-ai/auralogs-swift/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 ## Install
@@ -13,13 +13,13 @@ Auralog uses Claude as an on-call engineer: it monitors your logs and errors, al
 Add this package in Xcode:
 
 ```text
-https://github.com/auralog-ai/auralog-swift
+https://github.com/auralogs-ai/auralogs-swift
 ```
 
 Or add it to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/auralog-ai/auralog-swift.git", from: "0.1.0-beta.1")
+.package(url: "https://github.com/auralogs-ai/auralogs-swift.git", from: "0.1.0-beta.1")
 ```
 
 The beta targets Swift 5.9+ and Apple platforms supported by Swift Package Manager: iOS 15+, macOS 12+, tvOS 15+, watchOS 8+, and visionOS 1+.
@@ -27,29 +27,29 @@ The beta targets Swift 5.9+ and Apple platforms supported by Swift Package Manag
 ## Quick Start
 
 ```swift
-import Auralog
+import Auralogs
 
-try Auralog.initialize(
+try Auralogs.initialize(
     apiKey: "aura_your_key",
     environment: "production",
     captureMetricKit: true,
     captureUnhandledExceptions: true
 )
 
-Auralog.info("user signed in", metadata: ["user_id": "123"])
-Auralog.error("payment failed", metadata: ["order_id": "abc"])
+Auralogs.info("user signed in", metadata: ["user_id": "123"])
+Auralogs.error("payment failed", metadata: ["order_id": "abc"])
 ```
 
 ## SwiftUI Setup
 
 ```swift
-import Auralog
+import Auralogs
 import SwiftUI
 
 @main
 struct MyApp: App {
     init() {
-        try? Auralog.initialize(
+        try? Auralogs.initialize(
             apiKey: "aura_your_key",
             environment: "production",
             globalMetadata: [
@@ -71,17 +71,17 @@ struct MyApp: App {
 
 ## Seamless Error Capture
 
-Swift does not expose a global hook for every thrown `Error`. Use `Auralog.run` or `Auralog.task` at async boundaries where you would otherwise write a `do/catch`.
+Swift does not expose a global hook for every thrown `Error`. Use `Auralogs.run` or `Auralogs.task` at async boundaries where you would otherwise write a `do/catch`.
 
 ```swift
 .task {
-    await Auralog.run(metadata: ["screen": "home"]) {
+    await Auralogs.run(metadata: ["screen": "home"]) {
         try await viewModel.refresh()
     }
 }
 
 Button("Sync") {
-    Auralog.task(metadata: ["action": "manual_sync"]) {
+    Auralogs.task(metadata: ["action": "manual_sync"]) {
         try await syncNow()
     }
 }
@@ -89,21 +89,21 @@ Button("Sync") {
 
 ## SwiftLog Integration
 
-Add the `AuralogSwiftLog` product and route existing `swift-log` logs to Auralog:
+Add the `AuralogsSwiftLog` product and route existing `swift-log` logs to Auralogs:
 
 ```swift
-import AuralogSwiftLog
+import AuralogsSwiftLog
 
-AuralogSwiftLog.install()
+AuralogsSwiftLog.install()
 ```
 
-SwiftLog only allows one global logging backend. If your app already bootstraps `LoggingSystem`, install Auralog from the same logging setup or use a multiplexing handler.
+SwiftLog only allows one global logging backend. If your app already bootstraps `LoggingSystem`, install Auralogs from the same logging setup or use a multiplexing handler.
 
 ## Configuration
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `apiKey` | `String` | _required_ | Auralog project API key |
+| `apiKey` | `String` | _required_ | Auralogs project API key |
 | `environment` | `String` | `"production"` | e.g. `"production"`, `"staging"`, `"dev"` |
 | `endpoint` | `URL` | `https://ingest.auralog.ai` | Ingest endpoint override. Must be HTTPS unless `allowInsecureEndpoint` is set |
 | `allowInsecureEndpoint` | `Bool` | `false` | Permit non-HTTPS (`http://`) endpoints. Only enable for local development or trusted internal HTTP-only ingest |
@@ -116,8 +116,8 @@ SwiftLog only allows one global logging backend. If your app already bootstraps 
 | `httpTimeout` | `TimeInterval` | `30` | URLSession request/resource timeout |
 | `shutdownTimeout` | `TimeInterval` | `2` | Reserved default shutdown budget |
 | `traceId` | `String` | _auto-generated_ | Custom trace ID for distributed tracing |
-| `globalMetadata` | `AuralogMetadata` | _none_ | Static metadata merged into every entry |
-| `globalMetadataProvider` | `() -> AuralogMetadata?` | _none_ | Synchronous metadata supplier invoked per entry |
+| `globalMetadata` | `AuralogsMetadata` | _none_ | Static metadata merged into every entry |
+| `globalMetadataProvider` | `() -> AuralogsMetadata?` | _none_ | Synchronous metadata supplier invoked per entry |
 | `captureMetricKit` | `Bool` | `false` | Forward MetricKit metrics and diagnostics where available. In this beta, forwarding is implemented for iOS and no-ops on other platforms |
 | `captureUnhandledExceptions` | `Bool` | `false` | Capture uncaught Objective-C exceptions |
 
@@ -126,11 +126,11 @@ SwiftLog only allows one global logging backend. If your app already bootstraps 
 Use `globalMetadata` or `globalMetadataProvider` to attach session-scoped fields to every log:
 
 ```swift
-try Auralog.initialize(
+try Auralogs.initialize(
     apiKey: "aura_your_key",
     globalMetadata: ["service": "ios-app"],
     globalMetadataProvider: {
-        ["user_id": currentUserId.map(AuralogValue.string) ?? .null]
+        ["user_id": currentUserId.map(AuralogsValue.string) ?? .null]
     }
 )
 ```
@@ -140,11 +140,11 @@ The supplier runs on every emit, so keep it cheap and side-effect-free. Per-call
 ## Transport Semantics
 
 - Non-error logs are queued and flushed every `flushInterval`.
-- Calling `Auralog.flush()` drains all pending single and batch queues.
+- Calling `Auralogs.flush()` drains all pending single and batch queues.
 - Errors and fatals are prioritized onto `/v1/logs/single`.
 - 4xx ingest responses and redirects are treated as permanent failures and are not retried.
 - 5xx ingest responses and network failures are retried up to `maxRetryAttempts`.
-- The default transport uses `URLSession` and sends the project API key in the JSON body as `projectApiKey`, matching the other Auralog SDKs.
+- The default transport uses `URLSession` and sends the project API key in the JSON body as `projectApiKey`, matching the other Auralogs SDKs.
 
 ## Crash Reporting Notes
 
@@ -157,7 +157,7 @@ This SDK intentionally does not claim to be a full Crashlytics or Sentry replace
 
 ## App Store Privacy
 
-The package includes `PrivacyInfo.xcprivacy`. Auralog declares diagnostic data collection for App Functionality and does not declare tracking.
+The package includes `PrivacyInfo.xcprivacy`. Auralogs declares diagnostic data collection for App Functionality and does not declare tracking.
 
 Apps must still disclose the data they choose to attach through logs or metadata. If you include user IDs, device IDs, product interaction events, location, contact info, or other personal data, update your App Store privacy answers accordingly.
 

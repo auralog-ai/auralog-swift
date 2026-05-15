@@ -1,6 +1,6 @@
 import Foundation
 
-public enum AuralogLevel: String, Codable, Sendable {
+public enum AuralogsLevel: String, Codable, Sendable {
     case debug
     case info
     case warn
@@ -12,15 +12,15 @@ public enum AuralogLevel: String, Codable, Sendable {
     }
 }
 
-public typealias AuralogMetadata = [String: AuralogValue]
+public typealias AuralogsMetadata = [String: AuralogsValue]
 
-public enum AuralogValue: Codable, Equatable, Sendable, ExpressibleByStringLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByBooleanLiteral, ExpressibleByArrayLiteral, ExpressibleByDictionaryLiteral, ExpressibleByNilLiteral {
+public enum AuralogsValue: Codable, Equatable, Sendable, ExpressibleByStringLiteral, ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByBooleanLiteral, ExpressibleByArrayLiteral, ExpressibleByDictionaryLiteral, ExpressibleByNilLiteral {
     case string(String)
     case int(Int)
     case double(Double)
     case bool(Bool)
-    case array([AuralogValue])
-    case object([String: AuralogValue])
+    case array([AuralogsValue])
+    case object([String: AuralogsValue])
     case null
 
     public init(stringLiteral value: String) { self = .string(value) }
@@ -28,8 +28,8 @@ public enum AuralogValue: Codable, Equatable, Sendable, ExpressibleByStringLiter
     public init(floatLiteral value: Double) { self = .double(value) }
     public init(booleanLiteral value: Bool) { self = .bool(value) }
     public init(nilLiteral: ()) { self = .null }
-    public init(arrayLiteral elements: AuralogValue...) { self = .array(elements) }
-    public init(dictionaryLiteral elements: (String, AuralogValue)...) {
+    public init(arrayLiteral elements: AuralogsValue...) { self = .array(elements) }
+    public init(dictionaryLiteral elements: (String, AuralogsValue)...) {
         self = .object(Dictionary(uniqueKeysWithValues: elements))
     }
 
@@ -65,15 +65,15 @@ public enum AuralogValue: Codable, Equatable, Sendable, ExpressibleByStringLiter
             self = .double(value)
         } else if let value = try? container.decode(String.self) {
             self = .string(value)
-        } else if let value = try? container.decode([AuralogValue].self) {
+        } else if let value = try? container.decode([AuralogsValue].self) {
             self = .array(value)
         } else {
-            self = .object(try container.decode([String: AuralogValue].self))
+            self = .object(try container.decode([String: AuralogsValue].self))
         }
     }
 }
 
-public struct AuralogConfig: Sendable {
+public struct AuralogsConfig: Sendable {
     public var apiKey: String
     public var environment: String
     public var endpoint: URL
@@ -87,15 +87,15 @@ public struct AuralogConfig: Sendable {
     public var httpTimeout: TimeInterval
     public var shutdownTimeout: TimeInterval
     public var traceId: String
-    public var globalMetadata: AuralogMetadata
-    public var globalMetadataProvider: (@Sendable () -> AuralogMetadata?)?
+    public var globalMetadata: AuralogsMetadata
+    public var globalMetadataProvider: (@Sendable () -> AuralogsMetadata?)?
     public var captureMetricKit: Bool
     public var captureUnhandledExceptions: Bool
 
     public init(
         apiKey: String,
         environment: String = "production",
-        endpoint: URL = URL(string: "https://ingest.auralog.ai")!,
+        endpoint: URL = URL(string: "https://ingest.auralogs.ai")!,
         allowInsecureEndpoint: Bool = false,
         flushInterval: TimeInterval = 5,
         maxBatchSize: Int = 50,
@@ -105,9 +105,9 @@ public struct AuralogConfig: Sendable {
         retryMaxDelay: TimeInterval = 30,
         httpTimeout: TimeInterval = 30,
         shutdownTimeout: TimeInterval = 2,
-        traceId: String = AuralogTrace.generate(),
-        globalMetadata: AuralogMetadata = [:],
-        globalMetadataProvider: (@Sendable () -> AuralogMetadata?)? = nil,
+        traceId: String = AuralogsTrace.generate(),
+        globalMetadata: AuralogsMetadata = [:],
+        globalMetadataProvider: (@Sendable () -> AuralogsMetadata?)? = nil,
         captureMetricKit: Bool = false,
         captureUnhandledExceptions: Bool = false
     ) {
@@ -131,17 +131,17 @@ public struct AuralogConfig: Sendable {
     }
 }
 
-public struct AuralogEntry: Codable, Equatable, Sendable {
-    public var level: AuralogLevel
+public struct AuralogsEntry: Codable, Equatable, Sendable {
+    public var level: AuralogsLevel
     public var message: String
     public var environment: String
     public var timestamp: String
-    public var metadata: AuralogMetadata?
+    public var metadata: AuralogsMetadata?
     public var stackTrace: String?
     public var traceId: String
 }
 
-public enum AuralogError: Error, Equatable, LocalizedError {
+public enum AuralogsError: Error, Equatable, LocalizedError {
     case invalidConfiguration(String)
 
     public var errorDescription: String? {
@@ -152,7 +152,7 @@ public enum AuralogError: Error, Equatable, LocalizedError {
     }
 }
 
-public enum AuralogTrace {
+public enum AuralogsTrace {
     public static func generate() -> String {
         UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
     }

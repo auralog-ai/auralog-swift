@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "auralog-swift",
+    name: "auralogs-swift",
     platforms: [
         .iOS(.v15),
         .macOS(.v12),
@@ -12,29 +12,29 @@ let package = Package(
         .visionOS(.v1)
     ],
     products: [
-        .library(name: "Auralog", targets: ["Auralog"]),
-        .library(name: "AuralogSwiftLog", targets: ["AuralogSwiftLog"])
+        .library(name: "Auralogs", targets: ["Auralogs"]),
+        .library(name: "AuralogsSwiftLog", targets: ["AuralogsSwiftLog"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.6.0")
     ],
     targets: [
         .target(
-            name: "Auralog",
+            name: "Auralogs",
             resources: [
                 .process("Resources")
             ]
         ),
         .target(
-            name: "AuralogSwiftLog",
+            name: "AuralogsSwiftLog",
             dependencies: [
-                "Auralog",
+                "Auralogs",
                 .product(name: "Logging", package: "swift-log")
             ]
         ),
         .testTarget(
-            name: "AuralogTests",
-            dependencies: ["Auralog"]
+            name: "AuralogsTests",
+            dependencies: ["Auralogs"]
         )
     ]
 )

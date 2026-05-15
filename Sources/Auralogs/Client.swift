@@ -1,83 +1,83 @@
 import Foundation
 
-struct AuralogQueuedEntry: Sendable {
-    var entry: AuralogEntry
+struct AuralogsQueuedEntry: Sendable {
+    var entry: AuralogsEntry
     var attempts: Int
 }
 
-public actor AuralogClient {
-    private var config: AuralogConfig
-    private let transport: AuralogTransport
-    private var batchQueue: [AuralogQueuedEntry] = []
-    private var singleQueue: [AuralogQueuedEntry] = []
+public actor AuralogsClient {
+    private var config: AuralogsConfig
+    private let transport: AuralogsTransport
+    private var batchQueue: [AuralogsQueuedEntry] = []
+    private var singleQueue: [AuralogsQueuedEntry] = []
     private var stopped = false
     private var backgroundTask: Task<Void, Never>?
-    private let clock: any AuralogClock
+    private let clock: any AuralogsClock
 
-    public init(config: AuralogConfig, transport: AuralogTransport? = nil) throws {
-        try AuralogHTTPTransport.validate(config)
+    public init(config: AuralogsConfig, transport: AuralogsTransport? = nil) throws {
+        try AuralogsHTTPTransport.validate(config)
         self.config = config
         if let transport {
             self.transport = transport
         } else {
-            self.transport = try AuralogHTTPTransport(config: config)
+            self.transport = try AuralogsHTTPTransport(config: config)
         }
-        self.clock = DefaultAuralogClock()
+        self.clock = DefaultAuralogsClock()
         self.backgroundTask = nil
     }
 
-    init(config: AuralogConfig, transport: AuralogTransport, clock: any AuralogClock) throws {
-        try AuralogHTTPTransport.validate(config)
+    init(config: AuralogsConfig, transport: AuralogsTransport, clock: any AuralogsClock) throws {
+        try AuralogsHTTPTransport.validate(config)
         self.config = config
         self.transport = transport
         self.clock = clock
         self.backgroundTask = nil
     }
 
-    public func log(_ level: AuralogLevel, _ message: String, metadata: AuralogMetadata? = nil, stackTrace: String? = nil) async {
+    public func log(_ level: AuralogsLevel, _ message: String, metadata: AuralogsMetadata? = nil, stackTrace: String? = nil) async {
         guard !stopped else { return }
         startBackgroundFlushLoopIfNeeded()
         let entry = buildEntry(level, message, metadata: metadata, stackTrace: stackTrace)
         if level.isPriority {
-            singleQueue.append(AuralogQueuedEntry(entry: entry, attempts: 0))
+            singleQueue.append(AuralogsQueuedEntry(entry: entry, attempts: 0))
             Task { await flushSingles() }
         } else {
-            batchQueue.append(AuralogQueuedEntry(entry: entry, attempts: 0))
+            batchQueue.append(AuralogsQueuedEntry(entry: entry, attempts: 0))
             trimBatchQueue()
         }
     }
 
-    public func debug(_ message: String, metadata: AuralogMetadata? = nil) async {
+    public func debug(_ message: String, metadata: AuralogsMetadata? = nil) async {
         await log(.debug, message, metadata: metadata)
     }
 
-    public func info(_ message: String, metadata: AuralogMetadata? = nil) async {
+    public func info(_ message: String, metadata: AuralogsMetadata? = nil) async {
         await log(.info, message, metadata: metadata)
     }
 
-    public func warn(_ message: String, metadata: AuralogMetadata? = nil) async {
+    public func warn(_ message: String, metadata: AuralogsMetadata? = nil) async {
         await log(.warn, message, metadata: metadata)
     }
 
-    public func error(_ message: String, metadata: AuralogMetadata? = nil, stackTrace: String? = nil) async {
+    public func error(_ message: String, metadata: AuralogsMetadata? = nil, stackTrace: String? = nil) async {
         await log(.error, message, metadata: metadata, stackTrace: stackTrace)
     }
 
-    public func fatal(_ message: String, metadata: AuralogMetadata? = nil, stackTrace: String? = nil) async {
+    public func fatal(_ message: String, metadata: AuralogsMetadata? = nil, stackTrace: String? = nil) async {
         await log(.fatal, message, metadata: metadata, stackTrace: stackTrace)
     }
 
-    public func capture(_ error: Error, metadata: AuralogMetadata? = nil) async {
+    public func capture(_ error: Error, metadata: AuralogsMetadata? = nil) async {
         var merged = metadata ?? [:]
         merged["errorDescription"] = .string(String(describing: error))
         await self.error("Swift error captured", metadata: merged, stackTrace: Thread.callStackSymbols.joined(separator: "\n"))
     }
 
-    public func setGlobalMetadata(_ metadata: AuralogMetadata) {
+    public func setGlobalMetadata(_ metadata: AuralogsMetadata) {
         config.globalMetadata = metadata
     }
 
-    public func setGlobalMetadataProvider(_ provider: (@Sendable () -> AuralogMetadata?)?) {
+    public func setGlobalMetadataProvider(_ provider: (@Sendable () -> AuralogsMetadata?)?) {
         config.globalMetadataProvider = provider
     }
 
@@ -99,7 +99,7 @@ public actor AuralogClient {
         (batchQueue.count, singleQueue.count)
     }
 
-    private func buildEntry(_ level: AuralogLevel, _ message: String, metadata: AuralogMetadata?, stackTrace: String?) -> AuralogEntry {
+    private func buildEntry(_ level: AuralogsLevel, _ message: String, metadata: AuralogsMetadata?, stackTrace: String?) -> AuralogsEntry {
         var merged = config.globalMetadata
         if let supplied = config.globalMetadataProvider?() {
             for (key, value) in supplied {
@@ -112,11 +112,11 @@ public actor AuralogClient {
             }
         }
 
-        return AuralogEntry(
+        return AuralogsEntry(
             level: level,
             message: message,
             environment: config.environment,
-            timestamp: AuralogTimestamp.now(),
+            timestamp: AuralogsTimestamp.now(),
             metadata: merged.isEmpty ? nil : merged,
             stackTrace: stackTrace,
             traceId: config.traceId
@@ -145,15 +145,15 @@ public actor AuralogClient {
         }
     }
 
-    private func handle(result: AuralogSendResult, entries: [AuralogQueuedEntry], priority: Bool) async {
+    private func handle(result: AuralogsSendResult, entries: [AuralogsQueuedEntry], priority: Bool) async {
         switch result {
         case .success, .permanentFailure:
             return
         case .retryableFailure:
-            let retryable = entries.compactMap { queued -> AuralogQueuedEntry? in
+            let retryable = entries.compactMap { queued -> AuralogsQueuedEntry? in
                 let attempts = queued.attempts + 1
                 guard attempts < config.maxRetryAttempts else { return nil }
-                return AuralogQueuedEntry(entry: queued.entry, attempts: attempts)
+                return AuralogsQueuedEntry(entry: queued.entry, attempts: attempts)
             }
             if priority {
                 singleQueue.insert(contentsOf: retryable, at: 0)
@@ -184,18 +184,18 @@ public actor AuralogClient {
     }
 }
 
-protocol AuralogClock: Sendable {
+protocol AuralogsClock: Sendable {
     func sleep(seconds: TimeInterval) async
 }
 
-struct DefaultAuralogClock: AuralogClock {
+struct DefaultAuralogsClock: AuralogsClock {
     func sleep(seconds: TimeInterval) async {
         let nanoseconds = UInt64(max(0, seconds) * 1_000_000_000)
         try? await Task.sleep(nanoseconds: nanoseconds)
     }
 }
 
-enum AuralogTimestamp {
+enum AuralogsTimestamp {
     static func now() -> String {
         formatter.string(from: Date())
     }

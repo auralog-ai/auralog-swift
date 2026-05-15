@@ -1,25 +1,25 @@
 import Foundation
 
-public enum Auralog {
+public enum Auralogs {
     private static let lock = NSLock()
-    private static var client: AuralogClient?
-    private static var metricKitCapture: AuralogMetricKitCapture?
+    private static var client: AuralogsClient?
+    private static var metricKitCapture: AuralogsMetricKitCapture?
 
     @discardableResult
-    public static func initialize(_ config: AuralogConfig, transport: AuralogTransport? = nil) throws -> AuralogClient {
-        let newClient = try AuralogClient(config: config, transport: transport)
+    public static func initialize(_ config: AuralogsConfig, transport: AuralogsTransport? = nil) throws -> AuralogsClient {
+        let newClient = try AuralogsClient(config: config, transport: transport)
         lock.lock()
         defer { lock.unlock() }
         guard client == nil else {
             Task { await newClient.shutdown() }
-            throw AuralogError.invalidConfiguration("auralog: global client is already initialized")
+            throw AuralogsError.invalidConfiguration("auralogs: global client is already initialized")
         }
         client = newClient
         if config.captureUnhandledExceptions {
-            AuralogExceptionCapture.install(client: newClient)
+            AuralogsExceptionCapture.install(client: newClient)
         }
         if config.captureMetricKit {
-            metricKitCapture = AuralogMetricKitCapture.install(client: newClient)
+            metricKitCapture = AuralogsMetricKitCapture.install(client: newClient)
         }
         return newClient
     }
@@ -27,14 +27,14 @@ public enum Auralog {
     public static func initialize(
         apiKey: String,
         environment: String = "production",
-        endpoint: URL = URL(string: "https://ingest.auralog.ai")!,
+        endpoint: URL = URL(string: "https://ingest.auralogs.ai")!,
         allowInsecureEndpoint: Bool = false,
-        globalMetadata: AuralogMetadata = [:],
-        globalMetadataProvider: (@Sendable () -> AuralogMetadata?)? = nil,
+        globalMetadata: AuralogsMetadata = [:],
+        globalMetadataProvider: (@Sendable () -> AuralogsMetadata?)? = nil,
         captureMetricKit: Bool = false,
         captureUnhandledExceptions: Bool = false
     ) throws {
-        _ = try initialize(AuralogConfig(
+        _ = try initialize(AuralogsConfig(
             apiKey: apiKey,
             environment: environment,
             endpoint: endpoint,
@@ -46,39 +46,39 @@ public enum Auralog {
         ))
     }
 
-    public static func globalClient() -> AuralogClient? {
+    public static func globalClient() -> AuralogsClient? {
         lock.lock()
         defer { lock.unlock() }
         return client
     }
 
-    public static func debug(_ message: String, metadata: AuralogMetadata? = nil) {
+    public static func debug(_ message: String, metadata: AuralogsMetadata? = nil) {
         emit { await $0.debug(message, metadata: metadata) }
     }
 
-    public static func info(_ message: String, metadata: AuralogMetadata? = nil) {
+    public static func info(_ message: String, metadata: AuralogsMetadata? = nil) {
         emit { await $0.info(message, metadata: metadata) }
     }
 
-    public static func warn(_ message: String, metadata: AuralogMetadata? = nil) {
+    public static func warn(_ message: String, metadata: AuralogsMetadata? = nil) {
         emit { await $0.warn(message, metadata: metadata) }
     }
 
-    public static func error(_ message: String, metadata: AuralogMetadata? = nil, stackTrace: String? = nil) {
+    public static func error(_ message: String, metadata: AuralogsMetadata? = nil, stackTrace: String? = nil) {
         emit { await $0.error(message, metadata: metadata, stackTrace: stackTrace) }
     }
 
-    public static func fatal(_ message: String, metadata: AuralogMetadata? = nil, stackTrace: String? = nil) {
+    public static func fatal(_ message: String, metadata: AuralogsMetadata? = nil, stackTrace: String? = nil) {
         emit { await $0.fatal(message, metadata: metadata, stackTrace: stackTrace) }
     }
 
-    public static func capture(_ error: Error, metadata: AuralogMetadata? = nil) {
+    public static func capture(_ error: Error, metadata: AuralogsMetadata? = nil) {
         emit { await $0.capture(error, metadata: metadata) }
     }
 
     @discardableResult
     public static func run<T>(
-        metadata: AuralogMetadata? = nil,
+        metadata: AuralogsMetadata? = nil,
         operation: @Sendable () async throws -> T
     ) async rethrows -> T {
         do {
@@ -91,7 +91,7 @@ public enum Auralog {
 
     public static func task(
         priority: TaskPriority? = nil,
-        metadata: AuralogMetadata? = nil,
+        metadata: AuralogsMetadata? = nil,
         operation: @escaping @Sendable () async throws -> Void
     ) -> Task<Void, Never> {
         Task(priority: priority) {
@@ -109,11 +109,11 @@ public enum Auralog {
 
     public static func shutdown() async {
         let active = takeClient()
-        AuralogExceptionCapture.uninstall()
+        AuralogsExceptionCapture.uninstall()
         await active?.shutdown()
     }
 
-    private static func takeClient() -> AuralogClient? {
+    private static func takeClient() -> AuralogsClient? {
         lock.lock()
         defer { lock.unlock() }
         let active = client
@@ -122,7 +122,7 @@ public enum Auralog {
         return active
     }
 
-    private static func emit(_ action: @escaping @Sendable (AuralogClient) async -> Void) {
+    private static func emit(_ action: @escaping @Sendable (AuralogsClient) async -> Void) {
         guard let active = globalClient() else { return }
         Task {
             await action(active)

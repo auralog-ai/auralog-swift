@@ -1,15 +1,15 @@
-import Auralog
+import Auralogs
 import Logging
 
-public enum AuralogSwiftLog {
+public enum AuralogsSwiftLog {
     public static func install() {
         LoggingSystem.bootstrap { label in
-            AuralogLogHandler(label: label)
+            AuralogsLogHandler(label: label)
         }
     }
 }
 
-public struct AuralogLogHandler: LogHandler {
+public struct AuralogsLogHandler: LogHandler {
     public var metadata: Logger.Metadata = [:]
     public var metadataProvider: Logger.MetadataProvider?
     public var logLevel: Logger.Level = .info
@@ -39,39 +39,39 @@ public struct AuralogLogHandler: LogHandler {
             }
         }
 
-        var auralogMetadata = Self.convert(merged)
-        auralogMetadata["logger"] = .string(label)
-        auralogMetadata["source"] = .string(event.source)
-        auralogMetadata["file"] = .string(event.file)
-        auralogMetadata["function"] = .string(event.function)
-        auralogMetadata["line"] = .int(Int(event.line))
+        var auralogsMetadata = Self.convert(merged)
+        auralogsMetadata["logger"] = .string(label)
+        auralogsMetadata["source"] = .string(event.source)
+        auralogsMetadata["file"] = .string(event.file)
+        auralogsMetadata["function"] = .string(event.function)
+        auralogsMetadata["line"] = .int(Int(event.line))
         if let error = event.error {
-            auralogMetadata["errorDescription"] = .string(String(describing: error))
+            auralogsMetadata["errorDescription"] = .string(String(describing: error))
         }
 
         switch level {
         case .trace, .debug:
-            Auralog.debug(event.message.description, metadata: auralogMetadata)
+            Auralogs.debug(event.message.description, metadata: auralogsMetadata)
         case .info, .notice:
-            Auralog.info(event.message.description, metadata: auralogMetadata)
+            Auralogs.info(event.message.description, metadata: auralogsMetadata)
         case .warning:
-            Auralog.warn(event.message.description, metadata: auralogMetadata)
+            Auralogs.warn(event.message.description, metadata: auralogsMetadata)
         case .error:
-            Auralog.error(event.message.description, metadata: auralogMetadata)
+            Auralogs.error(event.message.description, metadata: auralogsMetadata)
         case .critical:
-            Auralog.fatal(event.message.description, metadata: auralogMetadata)
+            Auralogs.fatal(event.message.description, metadata: auralogsMetadata)
         }
     }
 
-    private static func convert(_ metadata: Logger.Metadata) -> AuralogMetadata {
-        var converted: AuralogMetadata = [:]
+    private static func convert(_ metadata: Logger.Metadata) -> AuralogsMetadata {
+        var converted: AuralogsMetadata = [:]
         for (key, value) in metadata {
             converted[key] = convert(value)
         }
         return converted
     }
 
-    private static func convert(_ value: Logger.Metadata.Value) -> AuralogValue {
+    private static func convert(_ value: Logger.Metadata.Value) -> AuralogsValue {
         switch value {
         case .string(let value):
             return .string(value)
@@ -80,7 +80,7 @@ public struct AuralogLogHandler: LogHandler {
         case .array(let values):
             return .array(values.map(convert))
         case .dictionary(let values):
-            var converted: [String: AuralogValue] = [:]
+            var converted: [String: AuralogsValue] = [:]
             for (key, value) in values {
                 converted[key] = convert(value)
             }

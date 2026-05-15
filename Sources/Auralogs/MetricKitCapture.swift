@@ -3,16 +3,16 @@ import Foundation
 #if canImport(MetricKit) && os(iOS)
 import MetricKit
 
-final class AuralogMetricKitCapture: NSObject, MXMetricManagerSubscriber {
-    private let client: AuralogClient
+final class AuralogsMetricKitCapture: NSObject, MXMetricManagerSubscriber {
+    private let client: AuralogsClient
 
-    private init(client: AuralogClient) {
+    private init(client: AuralogsClient) {
         self.client = client
         super.init()
     }
 
-    static func install(client: AuralogClient) -> AuralogMetricKitCapture? {
-        let capture = AuralogMetricKitCapture(client: client)
+    static func install(client: AuralogsClient) -> AuralogsMetricKitCapture? {
+        let capture = AuralogsMetricKitCapture(client: client)
         MXMetricManager.shared.add(capture)
         return capture
     }
@@ -63,8 +63,8 @@ final class AuralogMetricKitCapture: NSObject, MXMetricManagerSubscriber {
     }
 }
 #else
-final class AuralogMetricKitCapture {
-    static func install(client: AuralogClient) -> AuralogMetricKitCapture? {
+final class AuralogsMetricKitCapture {
+    static func install(client: AuralogsClient) -> AuralogsMetricKitCapture? {
         nil
     }
 }

@@ -1,18 +1,18 @@
 import Foundation
 
-enum AuralogExceptionCapture {
+enum AuralogsExceptionCapture {
     private static let lock = NSLock()
-    private static var client: AuralogClient?
+    private static var client: AuralogsClient?
     private static var previousHandler: NSUncaughtExceptionHandler?
 
-    static func install(client: AuralogClient) {
+    static func install(client: AuralogsClient) {
         lock.lock()
         self.client = client
         previousHandler = NSGetUncaughtExceptionHandler()
         lock.unlock()
 
         NSSetUncaughtExceptionHandler { exception in
-            AuralogExceptionCapture.handle(exception)
+            AuralogsExceptionCapture.handle(exception)
         }
     }
 
@@ -30,10 +30,10 @@ enum AuralogExceptionCapture {
         let previous = previousHandler
         lock.unlock()
 
-        let metadata: AuralogMetadata = [
+        let metadata: AuralogsMetadata = [
             "exceptionName": .string(exception.name.rawValue),
-            "exceptionReason": exception.reason.map(AuralogValue.string) ?? .null,
-            "callStackSymbols": .array(exception.callStackSymbols.map(AuralogValue.string))
+            "exceptionReason": exception.reason.map(AuralogsValue.string) ?? .null,
+            "callStackSymbols": .array(exception.callStackSymbols.map(AuralogsValue.string))
         ]
         Task {
             await active?.fatal("Uncaught Objective-C exception", metadata: metadata, stackTrace: exception.callStackSymbols.joined(separator: "\n"))
