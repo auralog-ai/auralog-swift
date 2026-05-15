@@ -3,22 +3,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "AuralogSwiftUIExample",
+    name: "AuralogsSwiftUIExample",
     platforms: [
         .macOS(.v12)
     ],
     products: [
-        .executable(name: "AuralogSwiftUIExample", targets: ["AuralogSwiftUIExample"])
+        .executable(name: "AuralogsSwiftUIExample", targets: ["AuralogsSwiftUIExample"])
     ],
     dependencies: [
         .package(path: "../..")
     ],
     targets: [
         .executableTarget(
-            name: "AuralogSwiftUIExample",
+            name: "AuralogsSwiftUIExample",
             dependencies: [
-                .product(name: "Auralog", package: "auralog-swift"),
-                .product(name: "AuralogSwiftLog", package: "auralog-swift")
+                .product(name: "Auralogs", package: "auralogs-swift"),
+                .product(name: "AuralogsSwiftLog", package: "auralogs-swift")
             ]
         )
     ]

@@ -1,25 +1,25 @@
-import Auralog
-import AuralogSwiftLog
+import Auralogs
+import AuralogsSwiftLog
 import Logging
 import SwiftUI
 
 @main
-struct AuralogSwiftUIExampleApp: App {
+struct AuralogsSwiftUIExampleApp: App {
     private let logger = Logger(label: "example.app")
 
     init() {
         if let apiKey = ProcessInfo.processInfo.environment["AURALOG_API_KEY"], !apiKey.isEmpty {
-            try? Auralog.initialize(
+            try? Auralogs.initialize(
                 apiKey: apiKey,
                 environment: ProcessInfo.processInfo.environment["AURALOG_ENVIRONMENT"] ?? "development",
                 globalMetadata: [
                     "example": true,
-                    "app": "AuralogSwiftUIExample"
+                    "app": "AuralogsSwiftUIExample"
                 ],
                 captureMetricKit: true,
                 captureUnhandledExceptions: true
             )
-            AuralogSwiftLog.install()
+            AuralogsSwiftLog.install()
         }
     }
 
@@ -36,17 +36,17 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text("Auralog SwiftUI Example")
+            Text("Auralogs SwiftUI Example")
                 .font(.title)
             Text(status)
                 .foregroundStyle(.secondary)
             Button("Send log") {
-                Auralog.info("example button tapped", metadata: ["screen": "home"])
-                logger.info("swift-log routed through Auralog", metadata: ["button": "send_log"])
+                Auralogs.info("example button tapped", metadata: ["screen": "home"])
+                logger.info("swift-log routed through Auralogs", metadata: ["button": "send_log"])
                 status = "Sent log"
             }
             Button("Run failing task") {
-                _ = Auralog.task(metadata: ["screen": "home", "action": "failing_task"]) {
+                _ = Auralogs.task(metadata: ["screen": "home", "action": "failing_task"]) {
                     struct ExampleError: Error {}
                     throw ExampleError()
                 }
